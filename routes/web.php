@@ -1,4 +1,4 @@
-<?php
+-<?php
 
 /*
 |--------------------------------------------------------------------------
@@ -13,4 +13,11 @@
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Auth::routes();
+
+Route::middleware('auth')->group(function () {
+    Route::get('/home', 'DashboardController@index')->name('home');
+    route::get('/fitbit', 'FitbitController@store')->name('fitbitHook');
 });
