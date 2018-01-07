@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use GuzzleHttp;
 use App\Models\User;
@@ -11,11 +12,13 @@ class FitbitController extends Controller
 {
     /**
      * Stores resource in the database
-     * @param User $user
+     * @param Request $request
      */
-    public function store(User $user)
+    public function store(Request $request)
     {
         $code = \request('code');
+        $user = $request->user();
+        $fitbit = $user->fitbit;
 
         if ($code) {
             $provider = new FitbitProvider([
@@ -28,6 +31,14 @@ class FitbitController extends Controller
                 'code' => $code
             ]);
 
+            $fitbit->update(
+                [
+                    'access_token' => $accessToken->getToken(),
+                    'refresh_token' => $accessToken->getRefreshToken(),
+                    'fitbit_id'     => $accessToken->getResourceOwnerId(),
+                    'expire_date'   => Carbon::createFromTimestamp($accessToken->getExpires())
+                ]
+            );
         }
     }
 }

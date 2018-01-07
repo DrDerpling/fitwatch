@@ -17,10 +17,13 @@ class CreateFitbitsTable extends Migration
             $table->increments('id');
             $table->integer('user_id');
 
-            $table->string('access_token');
-            $table->string('refresh_token');
+            $table->boolean('active')->default(false);
 
-            $table->timestamp('expire_date');
+            $table->string('fitbit_id')->nullable();
+            $table->text('access_token')->nullable();
+            $table->string('refresh_token')->nullable();
+
+            $table->timestamp('expire_date')->nullable();
             $table->timestamps();
         });
     }

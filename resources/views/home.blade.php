@@ -18,7 +18,7 @@
                     <br>
 
 
-                    <a href="{{$authorizationUrl}}">Registeer fitbit</a>
+                    <a href="{{$user->fitbit->authorizationUrl()}}">Registeer fitbit</a>
                 </div>
             </div>
         </div>

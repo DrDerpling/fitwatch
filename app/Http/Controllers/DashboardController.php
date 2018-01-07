@@ -3,25 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use djchen\OAuth2\Client\Provider\Fitbit as FitbitProvider;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
     /**
      * Show the application dashboard.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $Provider = new FitbitProvider([
-            'clientId'          => config('fitbit.client.id'),
-            'clientSecret'      => config('fitbit.client.secret'),
-            'redirectUri'       => route('fitbitHook')
-        ]);
+        $user = $request->user();
+        if (!$user->fitbit) {
+            $user->fitbit()->create([]);
+        }
 
-        $authorizationUrl = $Provider->getAuthorizationUrl();
-
-        return view('home', compact('authorizationUrl'));
+        return view('home', compact('user'));
     }
 }
