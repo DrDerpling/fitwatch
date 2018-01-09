@@ -15,7 +15,10 @@ class CreateWeightLogsTable extends Migration
     {
         Schema::create('weight_logs', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamps();
+            $table->integer('fibtit_id');
+            $table->float('bmi');
+            $table->float('weight');
+            $table->timestamp('log_date');
         });
     }
 
