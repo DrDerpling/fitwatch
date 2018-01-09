@@ -16,10 +16,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        if (!$user->fitbit) {
-            $user->fitbit()->create([]);
+        $fitbit = $user->fitbit;
+        if (!$fitbit) {
+            $fitbit =  $user->fitbit()->create(['active' => 0]);
         }
 
-        return view('home', compact('user'));
+
+        return view('home', compact('user', 'fitbit'));
     }
 }

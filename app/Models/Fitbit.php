@@ -9,7 +9,7 @@ use djchen\OAuth2\Client\Provider\Fitbit as FitbitProvider;
 class Fitbit extends Model
 {
     protected $fillable = [
-        'fitbit_id',
+        'fitbit_account_id',
         'access_token',
         'refresh_token',
         'active',
@@ -34,11 +34,19 @@ class Fitbit extends Model
     }
 
     /*
-     * Relatisonship methode to user class
+     * Relatisonship methode with user class
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relatsionship methode with fitbitStats class
+     */
+    public function fitbitStats()
+    {
+        return $this->hasOne(FitbitStats::class);
     }
 
     public function authorizationUrl()

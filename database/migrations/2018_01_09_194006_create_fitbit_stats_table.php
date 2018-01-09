@@ -16,12 +16,13 @@ class CreateFitbitStatsTable extends Migration
         Schema::create('fitbit_stats', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('user_id');
+            $table->integer('fitbit_id');
             $table->integer('age');
             $table->integer('height');
             $table->integer('average_daily_steps');
-            $table->integer('weight');
+            $table->float('weight');
 
+            $table->string('full_name');
             $table->string('birthday');
             $table->string('gender');
             $table->string('avatar');

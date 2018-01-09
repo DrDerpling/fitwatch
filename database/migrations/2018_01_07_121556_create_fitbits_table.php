@@ -19,7 +19,7 @@ class CreateFitbitsTable extends Migration
 
             $table->boolean('active')->default(false);
 
-            $table->string('fitbit_id')->nullable();
+            $table->string('fitbit_account_id')->nullable();
             $table->text('access_token')->nullable();
             $table->string('refresh_token')->nullable();
 
