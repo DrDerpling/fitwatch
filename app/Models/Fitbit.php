@@ -20,6 +20,19 @@ class Fitbit extends Model
         'expire_date'
     ];
 
+    public $provider;
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->provider = new FitbitProvider([
+            'clientId'          => config('fitbit.client.id'),
+            'clientSecret'      => config('fitbit.client.secret'),
+            'redirectUri'       => route('fitbitHook')
+        ]);
+    }
+
     /*
      * Relatisonship methode to user class
      */
@@ -30,11 +43,6 @@ class Fitbit extends Model
 
     public function authorizationUrl()
     {
-        $Provider = new FitbitProvider([
-            'clientId'          => config('fitbit.client.id'),
-            'clientSecret'      => config('fitbit.client.secret'),
-            'redirectUri'       => route('fitbitHook')
-        ]);
-        return $authorizationUrl = $Provider->getAuthorizationUrl();
+        return $this->provider->getAuthorizationUrl();
     }
 }

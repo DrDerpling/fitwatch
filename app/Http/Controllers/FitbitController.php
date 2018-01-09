@@ -13,6 +13,7 @@ class FitbitController extends Controller
     /**
      * Stores resource in the database
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -36,9 +37,16 @@ class FitbitController extends Controller
                     'access_token' => $accessToken->getToken(),
                     'refresh_token' => $accessToken->getRefreshToken(),
                     'fitbit_id'     => $accessToken->getResourceOwnerId(),
-                    'expire_date'   => Carbon::createFromTimestamp($accessToken->getExpires())
+                    'expire_date'   => Carbon::createFromTimestamp($accessToken->getExpires()),
+                    'active'        => 1,
                 ]
             );
+            $fibituser
+            $user->
+
         }
+
+        dd($provider->getResourceOwner($accessToken));
+        return redirect()->route('home');
     }
 }

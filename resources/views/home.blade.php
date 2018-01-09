@@ -17,8 +17,9 @@
                     You are logged in!
                     <br>
 
-
-                    <a href="{{$user->fitbit->authorizationUrl()}}">Registeer fitbit</a>
+                    @if(!$user->fitbit->active)
+                        <a href="{{$user->fitbit->authorizationUrl()}}">Registeer fitbit</a>
+                    @endif
                 </div>
             </div>
         </div>
