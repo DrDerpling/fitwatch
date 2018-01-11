@@ -58,4 +58,5 @@ class FitbitController extends Controller
 
         return redirect()->route('home');
     }
+    public function
 }
