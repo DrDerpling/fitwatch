@@ -32,17 +32,19 @@ class FitbitController extends Controller
                 'code' => $code
             ]);
 
+
+            $fitbitstats = $provider->getResourceOwner($accessToken)->toArray();
+
             $fitbit->update(
                 [
                     'access_token'  => $accessToken->getToken(),
                     'refresh_token' =>      $accessToken->getRefreshToken(),
                     'fitbit_account_id'     => $accessToken->getResourceOwnerId(),
                     'expire_date'   => Carbon::createFromTimestamp($accessToken->getExpires()),
+                    'last_sync_date' => $fitbitstats['memberSince'],
                     'active'        => 1,
                 ]
             );
-            $fitbitstats = $provider->getResourceOwner($accessToken)->toArray();
-
 
             //Convert to snake case
             $fitbitstats = array_merge([
@@ -52,11 +54,9 @@ class FitbitController extends Controller
                 'birthday'              =>       $fitbitstats['dateOfBirth'],
                 'full_name'             =>       $fitbitstats['fullName']
             ], $fitbitstats);
-            $fitbitstats = $user->fitbit->fitbitStats()->create($fitbitstats);
-
+            $user->fitbit->fitbitStats()->create($fitbitstats);
         }
 
         return redirect()->route('home');
     }
-    public function
 }

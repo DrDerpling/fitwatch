@@ -23,7 +23,7 @@ class CreateFitbitsTable extends Migration
             $table->text('access_token')->nullable();
             $table->string('refresh_token')->nullable();
 
-            $table->timestamp('last_sync_date')->nullable();
+            $table->timestamp('last_sync_date')->useCurrent();
             $table->timestamp('expire_date')->nullable();
             $table->timestamps();
         });

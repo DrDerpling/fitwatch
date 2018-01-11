@@ -13,11 +13,13 @@ class Fitbit extends Model
         'access_token',
         'refresh_token',
         'active',
-        'expire_date'
+        'expire_date',
+        'last_sync_date'
     ];
 
     public $dates = [
-        'expire_date'
+        'expire_date',
+        'last_sync_date'
     ];
 
     public $provider;
