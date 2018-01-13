@@ -19,7 +19,8 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', 'DashboardController@index')->name('home');
-    route::get('/fitbit', 'FitbitController@store')->name('fitbitHook');
+    route::get('/fitbit/store', 'FitbitController@store')->name('fitbitHook');
+    route::get('/fitbit/setup', 'FitbitController@setup')->name('fitbitSetup');
 
     //sync
     route::get('/sync/weight', 'SyncController@weightSync');
