@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     route::get('/fitbit/store', 'FitbitController@store')->name('fitbitHook');
     route::get('/fitbit/setup', 'FitbitController@setup')->name('fitbitSetup');
 
-    //sync
+    //sync test routes
     route::get('/sync/weight', 'SyncController@weightSync');
+    Route::get('/sync/activities', 'SyncController@activitiesSync');
 });

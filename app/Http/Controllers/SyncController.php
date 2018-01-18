@@ -9,7 +9,10 @@ class SyncController extends Controller
     public function weightSync(Request $request)
     {
         $user = $request->user();
-
-        dd($user->fibit)
+    }
+    public function activitiesSync(Request $request)
+    {
+        $user = $request->user();
+        $user->fitbit->syncActivities();
     }
 }

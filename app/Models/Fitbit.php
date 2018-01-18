@@ -8,6 +8,8 @@ use App\Models\WeightLog;
 use djchen\OAuth2\Client\Provider\Fitbit as FitbitProvider;
 use Illuminate\Support\Carbon;
 use GuzzleHttp;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+
 
 class Fitbit extends Model
 {
@@ -31,7 +33,6 @@ class Fitbit extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-
         $redirectUri = isset($attributes['$attributes'])? $attributes['$attributes'] : route('fitbitHook');
         $this->provider = new FitbitProvider([
             'clientId'          => config('fitbit.client.id'),
@@ -128,19 +129,15 @@ class Fitbit extends Model
         ], $fitbitStats);
         $this->fitbitStats()->create($fitbitStats);
     }
-
+    /*
+     * Syncs the weight log with the fitbit API
+     */
     public function syncWeightLog()
     {
-        $URL = 'https://api.fitbit.com/1/user/'.
-            $this->fitbit_account_id.
-            '/body/weight/date/'.
-            $this->last_sync_date->format('Y-m-d').
-            '/'.
-            now()->format('Y-m-d').
-            '.json';
+        $url = $this->getResourcePath('weight');
         $request = $this->GuzzleClient->request(
             'GET',
-            $URL,
+            $url,
             ['headers' =>[
                 'Authorization' => 'Bearer ' .$this->access_token
             ]]
@@ -149,7 +146,7 @@ class Fitbit extends Model
         $weightlog = $request->getBody()->getContents();
         $weightlog = json_decode($weightlog, true);
         $weightlog = collect($weightlog['body-weight']);
-        $weightlog = $weightlog->map(function ($log) {
+        return $weightlog = $weightlog->map(function ($log) {
             $newlog['weight'] = $log['value'];
             $newlog['fitbit_id'] = $this->id;
             $newlog['log_date'] = $log['dateTime'];
@@ -161,23 +158,77 @@ class Fitbit extends Model
     }
     public function syncActivities()
     {
-        $url = 'https://api.fitbit.com/1/user/'.
-            $this->fitbit_account_id.
+        $paths = $this->getResourcePaths('activities');
+        $requests = [];
 
-        $resourcePaths = [
-            'calories',
-            'caloriesBMR',
-            'steps',
-            'distance',
-            'floors',
-            'elevation',
-            'minutesSedentary',
-            'minutesLightlyActive',
-            'minutesFairlyActive',
-            'minutesVeryActive',
-            'activityCalories'
-        ];
+        foreach ($paths as $path) {
+            $requests[] = $this->GuzzleClient->get($path, $this->setupGuzzleHeader());
+        }
+        dd($requests[0]->getBody()->getContents());
+    }
 
+    /**
+     * @param $resource
+     * @return static
+     */
+    private function getResourcePaths($resource)
+    {
+        switch ($resource) {
+            case 'activities':
+                $url = 'https://api.fitbit.com/1/user/'.
+                    $this->fitbit_account_id.
+                    '/';
+                $resourcePaths = collect([
+                    'calories',
+                    'caloriesBMR',
+                    'steps',
+                    'distance',
+                    'floors',
+                    'elevation',
+                    'minutesSedentary',
+                    'minutesLightlyActive',
+                    'minutesFairlyActive',
+                    'minutesVeryActive',
+//                    'activityCalories'
+                ]);
+                return  $resourcePaths->map(function ($path) use ($url) {
 
+                        $newPath = $this->getBaseUrl().
+                            '/activities/'.$path.
+                            '/date/'.
+                            $this->last_sync_date->format('Y-m-d').'/'.Carbon::now()->format('Y-m-d').'.json';
+                        unset($path);
+                        return $newPath;
+                })->toArray();
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+    private function getResourcePath($resource)
+    {
+        switch ($resource) {
+            case 'weight':
+                return $URL = 'https://api.fitbit.com/1/user/'.
+                    $this->fitbit_account_id.
+                    '/body/weight/date/'.
+                    $this->last_sync_date->format('Y-m-d').
+                    '/'.
+                    now()->format('Y-m-d').
+                    '.json';
+                break;
+            default:
+                return false;
+                break;
+        }
+    }
+    private function getBaseUrl()
+    {
+        return 'https://api.fitbit.com/1/user/'.$this->fitbit_account_id;
+    }
+    private function setupGuzzleHeader()
+    {
+        return  ['headers' => ['Authorization' => 'Bearer ' .$this->access_token ]];
     }
 }
