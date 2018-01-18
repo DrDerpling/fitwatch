@@ -16,7 +16,7 @@ class CreateActivitiesTable extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->increments('id');
             $table->float('calories');
-            $table->float('calories_BMR');
+            $table->float('calories_BMR')->nullable();
             $table->float('floors');
             $table->float('elevation');
             $table->float('minutes_sedentary');

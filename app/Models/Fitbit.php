@@ -50,23 +50,58 @@ class Fitbit extends Model
     }
 
     /**
-     * Relatsionship methode with fitbitStats class
+     * Relationship method with fitbitStats class
      */
     public function fitbitStats()
     {
         return $this->hasOne(FitbitStats::class);
     }
 
+    /**
+     * Relationship method with WeightLog class
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function weightLog()
     {
         return $this->hasMany(WeightLog::class);
     }
 
+    /**
+     * Relationship method with Activities class
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function activities()
+    {
+        return $this->morphMany(Activities::class, 'activitieble');
+    }
+
+    /**
+     * Relationship method with Tracker class
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tracker()
+    {
+        return $this->hasMany(Tracker::class);
+    }
+
+    /**
+     * return url for fitbit authorization
+     *
+     * @return string
+     */
     public function authorizationUrl()
     {
         return $this->provider->getAuthorizationUrl();
     }
 
+    /**
+     * Setup fitbit account
+     *
+     * @param $token
+     */
     public function setup($token)
     {
         $accessToken = $this->provider->getAccessToken('authorization_code', [
@@ -123,5 +158,26 @@ class Fitbit extends Model
         });
 
         WeightLog::insert($weightlog->toArray());
+    }
+    public function syncActivities()
+    {
+        $url = 'https://api.fitbit.com/1/user/'.
+            $this->fitbit_account_id.
+
+        $resourcePaths = [
+            'calories',
+            'caloriesBMR',
+            'steps',
+            'distance',
+            'floors',
+            'elevation',
+            'minutesSedentary',
+            'minutesLightlyActive',
+            'minutesFairlyActive',
+            'minutesVeryActive',
+            'activityCalories'
+        ];
+
+
     }
 }

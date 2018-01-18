@@ -15,11 +15,14 @@ class CreateTrackersTable extends Migration
     {
         Schema::create('trackers', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('fitbit_id');
+
             $table->string('battery');
             $table->string('device');
             $table->string('device_id');
-            $table->timestamp('last_sync_time');
             $table->string('type');
+
+            $table->timestamp('last_sync_time');
             $table->timestamps();
         });
     }
