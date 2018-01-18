@@ -15,7 +15,7 @@
                             {{ session('status') }}
                         </div>
                     @endif
-                    @if(!$fitbit->active)
+                    @if($fitbit->active)
                         <div class="row">
                             <div class="col-md-4">
                                 <img class="img-circle" src="{{$fitbit->fitbitStats->avatar}}">
@@ -44,6 +44,14 @@
                         <a href="{{$fitbit->authorizationUrl()}}">Registeer fitbit</a>
                     @endif
                 </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">Setup</div>
+                <img src="{{asset('/storage/svg/loading.svg')}}" >
+
+                <div class="panel-body"> </div>
             </div>
         </div>
     </div>

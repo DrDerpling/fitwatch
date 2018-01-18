@@ -7,7 +7,7 @@
                     {{ session('status') }}
                 </div>
             @endif
-            @if(!$fitbit->active)
+            @if($fitbit->active)
                 <div class="row">
                     <div class="col-md-4">
                         <img class="img-circle" src="{{$fitbit->fitbitStats->avatar}}">
