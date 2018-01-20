@@ -156,7 +156,7 @@ class Fitbit extends Model
 
         WeightLog::insert($weightlog->toArray());
     }
-    public function syncActivities()
+    public function syncActivities($period = 'max')
     {
         $paths = $this->getResourcePaths('activities');
         $requests = [];
@@ -164,15 +164,21 @@ class Fitbit extends Model
         foreach ($paths as $path) {
             $requests[] = $this->GuzzleClient->get($path, $this->setupGuzzleHeader());
         }
-        dd($requests[0]->getBody()->getContents());
+        $requests[0]->getBody()->getContents();
     }
 
     /**
+     * Return a c collection with all the routes
+     *
      * @param $resource
      * @return static
      */
-    private function getResourcePaths($resource)
+    private function getResourcePaths($resource, $period)
     {
+        $resources = $this->getResources($resource);
+        if ($resources->count() === 1) {
+            //
+        }
         switch ($resource) {
             case 'activities':
                 $url = 'https://api.fitbit.com/1/user/'.
@@ -192,13 +198,37 @@ class Fitbit extends Model
 //                    'activityCalories'
                 ]);
                 return  $resourcePaths->map(function ($path) use ($url) {
-
                         $newPath = $this->getBaseUrl().
                             '/activities/'.$path.
                             '/date/'.
                             $this->last_sync_date->format('Y-m-d').'/'.Carbon::now()->format('Y-m-d').'.json';
                         unset($path);
                         return $newPath;
+                })->toArray();
+                break;
+            case 'trackerActivities':
+                $url = 'https://api.fitbit.com/1/user/'.
+                    $this->fitbit_account_id.
+                    '/';
+                $resourcePaths = collect([
+                    'calories',
+                    'steps',
+                    'distance',
+                    'floors',
+                    'elevation',
+                    'minutesSedentary',
+                    'minutesLightlyActive',
+                    'minutesFairlyActive',
+                    'minutesVeryActive',
+//                    'activityCalories'
+                ]);
+                return  $resourcePaths->map(function ($path) use ($url) {
+                    $newPath = $this->getBaseUrl('activities/tracker', $path,).
+                        '/activities/tracker/'.$path.
+                        '/date/'.
+                        $this->last_sync_date->format('Y-m-d').'/'.$period.'/.json';
+                    unset($path);
+                    return $newPath;
                 })->toArray();
                 break;
             default:
@@ -223,12 +253,41 @@ class Fitbit extends Model
                 break;
         }
     }
-    private function getBaseUrl()
+    private function getUri(
+        string $resourcePath,
+        string $resource,
+        Carbon $startDate,
+        string $period,
+        Carbon $endDate = null
+    )
     {
-        return 'https://api.fitbit.com/1/user/'.$this->fitbit_account_id;
+        $url =  'https://api.fitbit.com/1/user/'.
+            $this->fitbit_account_id.
+            '/'.
+            $resourcePath.
+            '/'.
+            $resource.
+            '/date/' . $startDate->format('Y-m-d');
+        if ($endDate) {
+            $url .= '/' . $endDate->format('Y-m-d');
+        } else {
+            $url .= '/' . $period;
+        }
+
+        return $url;
     }
     private function setupGuzzleHeader()
     {
         return  ['headers' => ['Authorization' => 'Bearer ' .$this->access_token ]];
+    }
+
+    /**
+     * retrieves resources available
+     * @param $resource
+     * @return \Illuminate\Support\Collection
+     */
+    private function getResources($resource)
+    {
+       return collect(config('fitbit.resources.'.$resource));
     }
 }
